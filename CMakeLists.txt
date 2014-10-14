@@ -364,6 +364,7 @@ if(ARITH STREQUAL "gmp")
 endif(ARITH STREQUAL "gmp")
 
 set(CMAKE_C_FLAGS "-pipe -std=c99 ${AFLAGS} ${WFLAGS} ${DFLAGS} ${PFLAGS} ${CFLAGS}")
+set(CMAKE_CXX_FLAGS "${WFLAGS} ${DFLAGS} ${CFLAGS}")
 set(CMAKE_EXE_LINKER_FLAGS ${LFLAGS})
 
 message(STATUS "Compiler flags: ${CMAKE_C_FLAGS}")
@@ -385,6 +386,10 @@ endif(LABEL)
 
 # Choose the arithmetic backend.
 set(LABEL "" CACHE STRING "Build label")
+
+if(CPP_BINDING)
+	add_subdirectory(relic_cpp)
+endif(CPP_BINDING)
 
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
