@@ -1,6 +1,4 @@
-#include <stdio.h>
-#include <string>
-#include <algorithm>
+//#include <stdio.h>
 
 #include "cpp/relic.h"
 
@@ -8,6 +6,9 @@ extern "C" {
 #include "relic.h"
 #include "relic_test.h"
 }
+
+#include <string>
+#include <algorithm>
 
 int main(void) {
   int code = STS_ERR;

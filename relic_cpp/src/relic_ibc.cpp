@@ -20,9 +20,22 @@
  * THE SOFTWARE.
  **/
 
-#pragma once
+#include "cpp/relic_ibc.h"
 
-#include "relic_bn.h"
-#include "relic_ec.h"
-#include "relic_hash.h"
-#include "relic_ibc.h"
+extern "C" {
+#include "relic_core.h"
+}
+
+namespace relic {
+namespace IBC {
+
+SHIBS::KGC() {
+	initRSA();
+}
+
+void SHIBS::KGC() {
+	
+}
+
+}
+}

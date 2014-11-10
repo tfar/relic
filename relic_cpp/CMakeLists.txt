@@ -44,3 +44,4 @@ endmacro(ADD_MODULE)
 
 ADD_MODULE(cpp_sh_ibs)
 ADD_MODULE(cpp_vbnn_ibs)
+ADD_MODULE(cpp_ibc)

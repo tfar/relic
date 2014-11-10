@@ -22,7 +22,55 @@
 
 #pragma once
 
+#include <memory>
+#include <vector>
+
 #include "relic_bn.h"
-#include "relic_ec.h"
-#include "relic_hash.h"
-#include "relic_ibc.h"
+
+namespace relic {
+namespace IBC {
+	class IBS {
+	public:
+		class User {
+		public:
+			virtual ~User() {}
+			virtual bool verify(const std::vector<char>& id, const std::vector<char>& message, const std::vector<char>& signature) const = 0;
+			virtual std::vector<char> sign(const std::vector<char>& message) const = 0;
+		};
+
+		class KGC {
+		public:
+			virtual ~KGC() {}
+			//virtual std::unique_ptr<User> generateUser(const std::vector<char>& id) = 0;
+		};
+	};
+
+	class SHIBS {
+	public:
+		class User : public IBS::User {
+		public:
+			User();
+			virtual ~User() {}
+			virtual bool verify(const std::vector<char>& id, const std::vector<char>& message, const std::vector<char>& signature) const;
+			virtual std::vector<char> sign(const std::vector<char>& message) const;
+		};
+
+		class KGC : public IBS::KGC {
+		public:
+			KGC();
+			virtual ~KGC() {}
+
+			//virtual std::unique_ptr<IBS::User> generateUser(const std::vector<char>& id);
+
+		private:
+			void initRSA();		
+
+		private:
+			relic::bn n;		/* N */
+			relic::bn mpk;		/* master public key */
+			relic::bn msk;		/* master secret key */
+		};
+	};
+
+}
+}
