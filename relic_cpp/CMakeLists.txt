@@ -6,6 +6,7 @@ list (APPEND CPP_SOURCES
   src/relic_bn.cpp
   src/relic_ec.cpp
   src/relic_hash.cpp
+  src/relic_ibc.cpp
   )
 
 SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
@@ -45,3 +46,21 @@ endmacro(ADD_MODULE)
 ADD_MODULE(cpp_sh_ibs)
 ADD_MODULE(cpp_vbnn_ibs)
 ADD_MODULE(cpp_ibc)
+ADD_MODULE(cpp_bn)
+
+macro(ADD_BENCH_MODULE MODULE)
+	add_executable(bench_${MODULE} bench/bench_${MODULE}.cpp)
+if (STLIB)
+  target_link_libraries(bench_${MODULE} relic_cpp_s)
+else(STLIB)
+  if (SHLIB)
+    target_link_libraries(bench_${MODULE} relic_cpp)
+  endif(SHLIB)
+endif(STLIB)
+	if (STBIN)
+		set_target_properties(bench_${MODULE} PROPERTIES LINK_SEARCH_END_STATIC 1)
+	endif(STBIN)
+	add_test(bench_${MODULE} ${SIMUL} ${SIMAR} ${EXECUTABLE_OUTPUT_PATH}/bench_${MODULE})
+endmacro(ADD_BENCH_MODULE)
+
+ADD_BENCH_MODULE(cpp_ibc)

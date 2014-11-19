@@ -20,42 +20,11 @@
  * THE SOFTWARE.
  **/
 
-#include "cpp/relic_hash.h"
+#pragma once
 
 namespace relic {
-  void concat(std::vector<uint8_t> &r, const char *s) {
-    int len = strlen(s);
-    r.insert(r.end(), s, s + len);
-  }
-
-  void concat(std::vector<uint8_t> &r, const int &i) {
-    int len = sizeof(int);
-    r.insert(r.end(), len, 0);
-    memcpy(r.data() + r.size() - len, &i, len);
-  }
-
-  void concat(std::vector<uint8_t> &r, const std::string &s) {
-    concat(r, s.c_str());
-  }
-
-  void concat(std::vector<uint8_t> &r, const std::vector<char> &vec) {
-    r.insert(r.end(), vec.data(), vec.data() + vec.size());
-  }
-
-  void concat(std::vector<uint8_t> &r, const ec &P) {
-    int P_size = -1;
-   P_size =  ec_size_bin(P.P, 1); // 0 indicates no point compression, 1 indicates compression
-
-    assert(P_size > 0);
-    r.insert(r.end(), P_size, 0);
-    ec_write_bin(r.data() + r.size() - P_size, P_size, P.P, 1);
-  }
-
-  void concat(std::vector<uint8_t> &r, const bn &n) {
-    int n_size = bn_size_bin(n);
-
-    assert(n_size > 0);
-    r.insert(r.end(), n_size, 0);
-    bn_write_bin(r.data() + r.size() - n_size, n_size, n.n);
-  }
+  class type {
+  public:
+    virtual ~type() {}
+  };
 }

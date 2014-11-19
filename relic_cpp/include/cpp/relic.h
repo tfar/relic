@@ -22,7 +22,8 @@
 
 #pragma once
 
+#include "relic_ibc.h"
+#include "relic_type.h"
 #include "relic_bn.h"
 #include "relic_ec.h"
 #include "relic_hash.h"
-#include "relic_ibc.h"

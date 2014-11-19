@@ -50,10 +50,30 @@ namespace relic {
     return *this;
   }
 
+  bn ec::get_x() const {
+    ec tmp;
+    bn x;
+    ec_norm(tmp, *this);
+    ec_get_x(x, tmp.P);
+    return x;
+  }
+
+  bn ec::order() {
+    bn n;
+    ec_curve_get_ord(n);
+    return n;
+  }
+
   ec ec::random() {
     ec rnd;
     ec_rand(rnd);
     return rnd;
+  }
+
+  ec ec::generator() {
+    ec gen;
+    ec_curve_get_gen(gen);
+    return gen;
   }
 
   // comparison operators

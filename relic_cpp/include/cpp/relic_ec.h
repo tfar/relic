@@ -22,18 +22,19 @@
 
 #pragma once
 
+#include "relic_bn.h"
+#include "relic_type.h"
+
 extern "C" {
 #include "../relic_ec.h"
 }
 
-#include "relic_bn.h"
-
 namespace relic {
-  class ec {
+  class ec : public type {
   public:
     ec();
     ec(const ec &other);
-    ~ec();
+    virtual ~ec();
 
     ec &operator=(const ec &that);
 
@@ -51,7 +52,11 @@ namespace relic {
     }
 #endif
 
+    bn get_x() const;
+
+    static bn order();
     static ec random();
+    static ec generator();
 
   private:
     void init();

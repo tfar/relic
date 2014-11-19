@@ -22,17 +22,19 @@
 
 #pragma once
 
+#include "relic_type.h"
+
 extern "C" {
 #include "../relic_bn.h"
 }
 
 namespace relic {
-  class bn {
+  class bn : public type {
   public:
     bn();
     bn(const bn &other);
     bn(const dig_t &digit);
-    ~bn();
+    virtual ~bn();
 
     bn &operator=(const bn &that);
 
@@ -50,9 +52,11 @@ namespace relic {
     }
 #endif
 
+    bn mul_mod_inv(const bn& mod);
     bn mxp(const bn &exponent, const bn &mod);
 
     static bn random(int bits = BN_BITS);
+    static bn nonzero_random(int bits = BN_BITS);
 
   private:
     void init();

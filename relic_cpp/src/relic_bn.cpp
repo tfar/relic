@@ -55,6 +55,16 @@ namespace relic {
     return *this;
   }
 
+  bn bn::mul_mod_inv(const bn& mod) {
+    relic::bn r;
+    relic::bn inv;
+    bn_gcd_ext(r, inv, NULL, n, mod);
+    if (bn_sign(inv) == BN_NEG) {
+      inv += mod;
+    }
+    return inv;
+  }
+
   bn bn::mxp(const bn &exponent, const bn &mod) {
     relic::bn r;
     bn_mxp(r.n, n, exponent.n, mod.n);
@@ -64,6 +74,14 @@ namespace relic {
   bn bn::random(int bits) {
     bn rnd;
     bn_rand(rnd, BN_POS, bits);
+    return rnd;
+  }
+
+  bn bn::nonzero_random(int bits) {
+    bn rnd;
+    do {
+      rnd = random(bits);
+    } while (bn_is_zero(rnd));
     return rnd;
   }
 

@@ -2,13 +2,17 @@
 
 #include "cpp/relic.h"
 
+#include <string>
+#include <algorithm>
+
 extern "C" {
 #include "relic.h"
 #include "relic_test.h"
 }
 
-#include <string>
-#include <algorithm>
+std::vector<char> vecFromString(const std::string& str) {
+  return std::vector<char>(str.data(), str.data() + str.size());
+}
 
 int main(void) {
   int code = STS_ERR;
@@ -18,6 +22,34 @@ int main(void) {
     core_clean();
     return 1;
   }
+
+  util_banner("Test of relic C++ binding for BN module:\n", 0);
+#if 0
+
+  TEST_ONCE("Test #1") {
+
+    using namespace std;
+    using namespace relic;
+
+    shared_ptr<IBC::IBS::KGC> kgc = make_shared<IBC::SHIBS::KGC>();
+
+    unique_ptr<IBC::IBS::User> userA = kgc->generateUser(vecFromString("UserA"));
+    unique_ptr<IBC::IBS::User> userB = kgc->generateUser(vecFromString("UserB"));
+
+    vector<char> someMessageA = vecFromString("Some message A.");
+    vector<char> someMessageB = vecFromString("Some message B.");
+
+    vector<char> sigUserAMsgA = userA->sign(someMessageA);
+    vector<char> sigUserAMsgB = userA->sign(someMessageB);
+    vector<char> sigUserBMsgA = userB->sign(someMessageA);
+    vector<char> sigUserBMsgB = userB->sign(someMessageB);
+
+    TEST_ASSERT(sigUserAMsgA.size() != 0, end);
+    TEST_ASSERT(sigUserAMsgB.size() != 0, end);
+    TEST_ASSERT(sigUserBMsgA.size() != 0, end);
+    TEST_ASSERT(sigUserBMsgB.size() != 0, end);
+  }
+  TEST_END;
 
   util_banner("Test of relic C++ binding for BN module:\n", 0);
 
@@ -96,7 +128,7 @@ int main(void) {
            "SH-IBS signature verification failed!");
   }
   TEST_END;
-
+#endif
   code = STS_OK;
 
   util_banner("All tests have passed.\n", 0);

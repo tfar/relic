@@ -21,7 +21,7 @@
  **/
 
 #pragma once
- 
+
 #include <cassert>
 
 #include <array>
@@ -48,6 +48,7 @@ namespace relic {
 
   // c++ types
   void concat(std::vector<uint8_t> &r, const std::string &str);
+  void concat(std::vector<uint8_t> &r, const std::vector<char> &vec);
 
   // relic types
   void concat(std::vector<uint8_t> &r, const ec &P);
