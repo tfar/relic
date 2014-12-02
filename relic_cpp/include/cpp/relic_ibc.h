@@ -91,14 +91,13 @@ namespace IBC {
 	public:
 		class User : public IBS::User {
 		public:
-			User(const std::vector<char>& id, relic::ec P, relic::ec mpk, relic::ec keyR, relic::bn keys);
+			User(const std::vector<char>& id, relic::ec mpk, relic::ec keyR, relic::bn keys);
 			virtual ~User() {}
 			virtual bool verify(const std::vector<char>& id, const std::vector<char>& message, const std::vector<std::unique_ptr<type> >& signature) const;
 			virtual std::vector<std::unique_ptr<type> > sign(const std::vector<char>& message) const;
 
 		private:
 			std::vector<char> id_;
-			relic::ec P_;		/* generator */
 			relic::ec mpk_; /* master */
 
 			relic::ec keyR_;	/* ID key */

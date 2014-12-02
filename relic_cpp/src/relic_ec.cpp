@@ -22,6 +22,8 @@
 
 #include "cpp/relic_ec.h"
 
+#include <assert.h>
+
 extern "C" {
 #include "relic_core.h"
 }
@@ -61,6 +63,7 @@ namespace relic {
   bn ec::order() {
     bn n;
     ec_curve_get_ord(n);
+    assert(!bn_is_zero(n));
     return n;
   }
 
@@ -73,6 +76,12 @@ namespace relic {
   ec ec::generator() {
     ec gen;
     ec_curve_get_gen(gen);
+    return gen;
+  }
+
+    ec ec::mul_gen(const bn &n) {
+    ec gen;
+    ec_mul_gen(gen, n);
     return gen;
   }
 

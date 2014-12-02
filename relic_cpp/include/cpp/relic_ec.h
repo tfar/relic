@@ -57,6 +57,7 @@ namespace relic {
     static bn order();
     static ec random();
     static ec generator();
+    static ec mul_gen(const bn &n);
 
   private:
     void init();

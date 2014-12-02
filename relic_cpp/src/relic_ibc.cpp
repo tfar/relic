@@ -128,8 +128,7 @@ void SHIBS::KGC::initRSA() {
   }
 }
 
-vBNN_IBS::User::User(const std::vector<char>& id, relic::ec P, relic::ec mpk, relic::ec keyR, relic::bn keys) : id_(id), P_(P), mpk_(mpk), keyR_(keyR), keys_(keys) {
-
+vBNN_IBS::User::User(const std::vector<char>& id, relic::ec mpk, relic::ec keyR, relic::bn keys) : id_(id), mpk_(mpk), keyR_(keyR), keys_(keys) {
 }
 
 bool vBNN_IBS::User::verify(const std::vector<char>& id, const std::vector<char>& message, const std::vector<std::unique_ptr<type> >& signature) const {
@@ -142,7 +141,7 @@ bool vBNN_IBS::User::verify(const std::vector<char>& id, const std::vector<char>
 	// === Signature Verification ===
 	bn n = ec::order();
 	bn c = hash_mod_bn(n, id, R);
-	ec Z = (P_ * z) - (R + mpk_ * c) * h;
+	ec Z = ec::mul_gen(z) - (R + mpk_ * c) * h;
 
 	valid = (h == hash_mod_bn(n, id, message, R, Z));
 
@@ -151,11 +150,11 @@ bool vBNN_IBS::User::verify(const std::vector<char>& id, const std::vector<char>
 
 std::vector<std::unique_ptr<type> > vBNN_IBS::User::sign(const std::vector<char>& message) const {
 	std::vector<std::unique_ptr<type> > signature;
-
-	bn y = bn::random();
+	
 	bn n = ec::order();
+	bn y = bn::random() % n;
 	bn h, z;
-	ec Y = P_ * y;
+	ec Y = ec::mul_gen(y);
 	h = hash_mod_bn(n, id_, message, keyR_, Y);
 	z = (y + h * keys_) % n;
 
@@ -166,24 +165,22 @@ std::vector<std::unique_ptr<type> > vBNN_IBS::User::sign(const std::vector<char>
 }
 
 vBNN_IBS::KGC::KGC() {
-	assert(ep_param_set_any() == STS_OK);
-
 	// === Setup ===
 	bn n = ec::order();
-	msk_ = bn::nonzero_random();
-	P_ = ec::random();
+	msk_ = bn::nonzero_random() % n;
+	P_ = ec::generator();
 	mpk_ = P_ * msk_;
 }
 
 std::unique_ptr<IBS::User> vBNN_IBS::KGC::generateUser(const std::vector<char>& id) {
 	// === Key Extraction ===
 	bn n = ec::order();
-	bn r = bn::nonzero_random();
+	bn r = bn::nonzero_random() % n;
 	bn ID_key;
-	ec keyR = P_ * r;
+	ec keyR = ec::mul_gen(r);
 	bn keys = (r + hash_mod_bn(n, id, keyR) * msk_) % n;
 
-	std::unique_ptr<IBS::User> user(new vBNN_IBS::User(id, P_, mpk_, keyR, keys));
+	std::unique_ptr<IBS::User> user(new vBNN_IBS::User(id, mpk_, keyR, keys));
 	return user;
 }
 
@@ -262,8 +259,6 @@ std::vector<std::unique_ptr<type> > ECCSI::User::sign(const std::vector<char>& m
 }
 
 ECCSI::KGC::KGC() {
-	assert(ep_param_set_any() == STS_OK);
-
 	// === Setup ===
 	KSAK_ = bn::nonzero_random();
 

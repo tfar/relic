@@ -9,7 +9,7 @@ list (APPEND CPP_SOURCES
   src/relic_ibc.cpp
   )
 
-SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11")
+SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -fPIC")
 
 # build c++ binding
 add_library(core OBJECT ${CPP_SOURCES})

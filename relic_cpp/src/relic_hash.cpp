@@ -22,6 +22,8 @@
 
 #include "cpp/relic_hash.h"
 
+#include <cstring>
+
 namespace relic {
   void concat(std::vector<uint8_t> &r, const char *s) {
     int len = strlen(s);
