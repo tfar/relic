@@ -142,6 +142,8 @@ int main(void) {
     return 1;
   }
 
+  assert(ec_param_set_any() == STS_OK);
+
   conf_print();
 
   util_banner("Benchmarks for the RELIC C++ IBC implementation:", 0);
