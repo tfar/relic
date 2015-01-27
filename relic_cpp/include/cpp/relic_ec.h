@@ -26,7 +26,7 @@
 #include "relic_type.h"
 
 extern "C" {
-#include "../relic_ec.h"
+#include <relic_ec.h>
 }
 
 namespace relic {

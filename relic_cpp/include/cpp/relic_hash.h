@@ -33,8 +33,8 @@
 #include "cpp/relic_ec.h"
 
 extern "C" {
-#include "../relic_md.h"
-#include "../relic_util.h"
+#include <relic_md.h>
+#include <relic_util.h>
 }
 
 namespace relic {
