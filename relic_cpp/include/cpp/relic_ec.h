@@ -23,18 +23,17 @@
 #pragma once
 
 #include "relic_bn.h"
-#include "relic_type.h"
 
 extern "C" {
 #include <relic_ec.h>
 }
 
 namespace relic {
-  class ec : public type {
+  class ec {
   public:
     ec();
     ec(const ec &other);
-    virtual ~ec();
+    ~ec();
 
     ec &operator=(const ec &that);
 

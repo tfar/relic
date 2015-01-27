@@ -22,7 +22,7 @@ int main(void) {
 
   TEST_ONCE("Test #1") {
     using namespace relic;
-    assert(ep_param_set_any() == STS_OK);
+    assert(ec_param_set_any() == STS_OK);
 
     // === Setup ===
     bn n, x;

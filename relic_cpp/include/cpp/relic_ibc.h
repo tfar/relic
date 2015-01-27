@@ -24,39 +24,24 @@
 
 #include <memory>
 #include <vector>
+#include <tuple>
 
 #include "relic_bn.h"
 #include "relic_ec.h"
 
 namespace relic {
 namespace IBC {
-	class IBS {
-	public:
-		class User {
-		public:
-			virtual ~User() {}
-			virtual bool verify(const std::vector<char>& id, const std::vector<char>& message, const std::vector<std::unique_ptr<type> >& signature) const = 0;
-			virtual std::vector<std::unique_ptr<type> > sign(const std::vector<char>& message) const = 0;
-		};
-
-		class KGC {
-		public:
-			virtual ~KGC() {}
-			virtual std::unique_ptr<User> generateUser(const std::vector<char>& id) = 0;
-		};
-	};
-
 	/**
 	 *	SH-IBS: Shamir IBS implementation
 	 */
 	class SHIBS {
 	public:
-		class User : public IBS::User {
+		class User {
 		public:
 			User(const std::vector<char>& id, relic::bn mpk, relic::bn n, relic::bn key);
-			virtual ~User() {}
-			virtual bool verify(const std::vector<char>& id, const std::vector<char>& message, const std::vector<std::unique_ptr<type> >& signature) const;
-			virtual std::vector<std::unique_ptr<type> > sign(const std::vector<char>& message) const;
+			~User() {}
+			bool verify(const std::vector<char>& id, const std::vector<char>& message, const std::tuple<relic::bn, relic::bn>& signature) const;
+			std::tuple<relic::bn, relic::bn> sign(const std::vector<char>& message) const;
 
 		private:
 			std::vector<char> id_;
@@ -66,12 +51,12 @@ namespace IBC {
 			relic::bn key_;
 		};
 
-		class KGC : public IBS::KGC {
+		class KGC {
 		public:
 			KGC();
-			virtual ~KGC() {}
+			~KGC() {}
 
-			virtual std::unique_ptr<IBS::User> generateUser(const std::vector<char>& id);
+			User generateUser(const std::vector<char>& id);
 
 		private:
 			void initRSA();
@@ -89,12 +74,12 @@ namespace IBC {
 	 */
 	class vBNN_IBS {
 	public:
-		class User : public IBS::User {
+		class User {
 		public:
 			User(const std::vector<char>& id, relic::ec mpk, relic::ec keyR, relic::bn keys);
-			virtual ~User() {}
-			virtual bool verify(const std::vector<char>& id, const std::vector<char>& message, const std::vector<std::unique_ptr<type> >& signature) const;
-			virtual std::vector<std::unique_ptr<type> > sign(const std::vector<char>& message) const;
+			~User() {}
+			bool verify(const std::vector<char>& id, const std::vector<char>& message,  const std::tuple<relic::ec, relic::bn, relic::bn>& signature) const;
+			std::tuple<relic::ec, relic::bn, relic::bn> sign(const std::vector<char>& message) const;
 
 		private:
 			std::vector<char> id_;
@@ -104,12 +89,12 @@ namespace IBC {
 			relic::bn keys_;	/* ID key */
 		};
 
-		class KGC : public IBS::KGC {
+		class KGC {
 		public:
 			KGC();
-			virtual ~KGC() {}
+			~KGC() {}
 
-			virtual std::unique_ptr<IBS::User> generateUser(const std::vector<char>& id);
+			vBNN_IBS::User generateUser(const std::vector<char>& id);
 
 		private:
 			relic::ec P_;				/* generator */
@@ -118,6 +103,7 @@ namespace IBC {
 		};
 	};
 
+#if 0
 	/**
 	 *	ECCSI: RFC 6507: Elliptic Curve-Based Certificateless Signatures for Identity-Based Encryption (ECCSI)
 	 */
@@ -152,6 +138,6 @@ namespace IBC {
 			relic::bn KSAK_; /* master secret key */
 		};
 	};
-
+#endif
 }
 }

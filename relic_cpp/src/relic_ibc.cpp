@@ -34,13 +34,11 @@ SHIBS::User::User(const std::vector<char>& id, relic::bn mpk, relic::bn n, relic
 
 }
 
-bool SHIBS::User::verify(const std::vector<char>& id, const std::vector<char>& message, const std::vector<std::unique_ptr<type> >& signature) const {
+bool SHIBS::User::verify(const std::vector<char>& id, const std::vector<char>& message, const std::tuple<relic::bn, relic::bn>& signature) const {
 	bool valid = false;
 
-	relic::bn s, t;
-
-	s = *dynamic_cast<relic::bn*>(signature[0].get());
-	t = *dynamic_cast<relic::bn*>(signature[1].get());
+	relic::bn s = std::get<0>(signature);
+	const relic::bn& t = std::get<1>(signature);
 
 	// s^e =?= H(ID) * t^(H(t, m)) mod n
 	relic::bn left_side = s.mxp(mpk_, n_);
@@ -52,11 +50,12 @@ bool SHIBS::User::verify(const std::vector<char>& id, const std::vector<char>& m
 	return valid;
 }
 
-std::vector<std::unique_ptr<type> > SHIBS::User::sign(const std::vector<char>& message) const {
-	std::vector<std::unique_ptr<type> > signature;
+std::tuple<relic::bn, relic::bn> SHIBS::User::sign(const std::vector<char>& message) const {
+	std::tuple<relic::bn, relic::bn> signature;
 
 	relic::bn f; /* message hash */
-	relic::bn s, t; /* signature */
+	relic::bn& s = std::get<0>(signature); /* signature */
+	relic::bn& t = std::get<1>(signature); /* signature */
 
 	// generate random number r
 	relic::bn r;
@@ -74,24 +73,20 @@ std::vector<std::unique_ptr<type> > SHIBS::User::sign(const std::vector<char>& m
 	// compute s = s_ID * r ^ f mod n
 	s = (key_ * r.mxp(f, n_) % n_);
 
-	// write s, t to the vector
-	signature.emplace_back(new bn(s));
-	signature.emplace_back(new bn(t));
 	return signature;
 }
 
-SHIBS::KGC::KGC() : IBS::KGC() {
+SHIBS::KGC::KGC() {
 	initRSA();
 }
 
-std::unique_ptr<IBS::User> SHIBS::KGC::generateUser(const std::vector<char>& id) {
+SHIBS::User SHIBS::KGC::generateUser(const std::vector<char>& id) {
 	// === SH-IBS: Key Extraction ===
 	relic::bn ID_key = relic::hash_mod_bn(n_, id);
 
 	ID_key = ID_key.mxp(msk_, n_);
 
-	std::unique_ptr<IBS::User> user(new SHIBS::User(id, mpk_, n_, ID_key));
-	return user;
+	return SHIBS::User(id, mpk_, n_, ID_key);
 }
 
 void SHIBS::KGC::initRSA() {
@@ -131,12 +126,12 @@ void SHIBS::KGC::initRSA() {
 vBNN_IBS::User::User(const std::vector<char>& id, relic::ec mpk, relic::ec keyR, relic::bn keys) : id_(id), mpk_(mpk), keyR_(keyR), keys_(keys) {
 }
 
-bool vBNN_IBS::User::verify(const std::vector<char>& id, const std::vector<char>& message, const std::vector<std::unique_ptr<type> >& signature) const {
+bool vBNN_IBS::User::verify(const std::vector<char>& id, const std::vector<char>& message, const std::tuple<relic::ec, relic::bn, relic::bn>& signature) const {
 	bool valid = false;
 
-	ec R = *dynamic_cast<relic::ec*>(signature[0].get());
-	bn z = *dynamic_cast<relic::bn*>(signature[1].get());
-	bn h = *dynamic_cast<relic::bn*>(signature[2].get());
+	const ec& R = std::get<0>(signature);
+	const bn& z = std::get<1>(signature);
+	const bn& h = std::get<2>(signature);
 
 	// === Signature Verification ===
 	bn n = ec::order();
@@ -148,8 +143,8 @@ bool vBNN_IBS::User::verify(const std::vector<char>& id, const std::vector<char>
 	return valid;
 }
 
-std::vector<std::unique_ptr<type> > vBNN_IBS::User::sign(const std::vector<char>& message) const {
-	std::vector<std::unique_ptr<type> > signature;
+std::tuple<relic::ec, relic::bn, relic::bn> vBNN_IBS::User::sign(const std::vector<char>& message) const {
+	std::tuple<relic::ec, relic::bn, relic::bn> signature;
 	
 	bn n = ec::order();
 	bn y = bn::random() % n;
@@ -158,9 +153,10 @@ std::vector<std::unique_ptr<type> > vBNN_IBS::User::sign(const std::vector<char>
 	h = hash_mod_bn(n, id_, message, keyR_, Y);
 	z = (y + h * keys_) % n;
 
-	signature.emplace_back(new ec(keyR_));
-	signature.emplace_back(new bn(z));
-	signature.emplace_back(new bn(h));
+	std::get<0>(signature) = keyR_;
+	std::get<1>(signature) = z;
+	std::get<2>(signature) = h;
+
 	return signature;
 }
 
@@ -172,7 +168,7 @@ vBNN_IBS::KGC::KGC() {
 	mpk_ = P_ * msk_;
 }
 
-std::unique_ptr<IBS::User> vBNN_IBS::KGC::generateUser(const std::vector<char>& id) {
+vBNN_IBS::User vBNN_IBS::KGC::generateUser(const std::vector<char>& id) {
 	// === Key Extraction ===
 	bn n = ec::order();
 	bn r = bn::nonzero_random() % n;
@@ -180,10 +176,10 @@ std::unique_ptr<IBS::User> vBNN_IBS::KGC::generateUser(const std::vector<char>& 
 	ec keyR = ec::mul_gen(r);
 	bn keys = (r + hash_mod_bn(n, id, keyR) * msk_) % n;
 
-	std::unique_ptr<IBS::User> user(new vBNN_IBS::User(id, mpk_, keyR, keys));
-	return user;
+	return vBNN_IBS::User(id, mpk_, keyR, keys);
 }
 
+#if 0
 ECCSI::User::User(const std::vector<char>& id, relic::ec KPAK, relic::bn SSK, relic::ec PVT) : id_(id), KPAK_(KPAK), SSK_(SSK), PVT_(PVT) {
 	HS_ = hash_mod_bn(ec::order(), ec::generator(), KPAK_, id, PVT_);
 
@@ -281,6 +277,6 @@ std::unique_ptr<IBS::User> ECCSI::KGC::generateUser(const std::vector<char>& id)
 	std::unique_ptr<IBS::User> user(new ECCSI::User(id, KPAK_, SSK, PVT));
 	return user;
 }
-
+#endif
 }
 }

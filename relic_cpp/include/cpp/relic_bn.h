@@ -22,19 +22,17 @@
 
 #pragma once
 
-#include "relic_type.h"
-
 extern "C" {
 #include <relic_bn.h>
 }
 
 namespace relic {
-  class bn : public type {
+  class bn {
   public:
     bn();
     bn(const bn &other);
     bn(const dig_t &digit);
-    virtual ~bn();
+    ~bn();
 
     bn &operator=(const bn &that);
 

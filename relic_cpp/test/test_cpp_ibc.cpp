@@ -29,29 +29,25 @@ int main(void) {
     using namespace std;
     using namespace relic;
 
-    shared_ptr<IBC::IBS::KGC> kgc = make_shared<IBC::SHIBS::KGC>();
+    IBC::SHIBS::KGC kgc;
 
-    unique_ptr<IBC::IBS::User> userA = kgc->generateUser(vecFromString("UserA"));
-    unique_ptr<IBC::IBS::User> userB = kgc->generateUser(vecFromString("UserB"));
+    IBC::SHIBS::User userA = kgc.generateUser(vecFromString("UserA"));
+    IBC::SHIBS::User userB = kgc.generateUser(vecFromString("UserB"));
 
     vector<char> someMessageA = vecFromString("Some message A.");
     vector<char> someMessageB = vecFromString("Some message B.");
 
-    std::array<std::vector<unique_ptr<type> >, 4> signatures;
+    std::array<std::tuple<relic::bn, relic::bn>, 4> signatures;
 
-    signatures[0] = userA->sign(someMessageA);
-    signatures[1] = userA->sign(someMessageB);
-    signatures[2] = userB->sign(someMessageA);
-    signatures[3] = userB->sign(someMessageB);
-
-    for (int n = 0; n < signatures.size(); n++) {
-      TEST_ASSERT(signatures[n].size() != 0, end);
-    }
+    signatures[0] = userA.sign(someMessageA);
+    signatures[1] = userA.sign(someMessageB);
+    signatures[2] = userB.sign(someMessageA);
+    signatures[3] = userB.sign(someMessageB);
 
     for (int n = 0; n < signatures.size(); n++) {
       auto id = n > 1 ? vecFromString("UserB") : vecFromString("UserA");
       auto msg = n % 2 ? someMessageB : someMessageA;
-      TEST_ASSERT(userA->verify(id, msg, signatures[n]), end);
+      TEST_ASSERT(userA.verify(id, msg, signatures[n]), end);
     }
   }
   TEST_END;
@@ -60,33 +56,30 @@ int main(void) {
     using namespace std;
     using namespace relic;
 
-    shared_ptr<IBC::IBS::KGC> kgc = make_shared<IBC::vBNN_IBS::KGC>();
+    IBC::vBNN_IBS::KGC kgc;
 
-    unique_ptr<IBC::IBS::User> userA = kgc->generateUser(vecFromString("UserA"));
-    unique_ptr<IBC::IBS::User> userB = kgc->generateUser(vecFromString("UserB"));
+    IBC::vBNN_IBS::User userA = kgc.generateUser(vecFromString("UserA"));
+    IBC::vBNN_IBS::User userB = kgc.generateUser(vecFromString("UserB"));
 
     vector<char> someMessageA = vecFromString("Some message A.");
     vector<char> someMessageB = vecFromString("Some message B.");
 
-    std::array<std::vector<unique_ptr<type> >, 4> signatures;
+    std::array<std::tuple<relic::ec, relic::bn, relic::bn>, 4> signatures;
 
-    signatures[0] = userA->sign(someMessageA);
-    signatures[1] = userA->sign(someMessageB);
-    signatures[2] = userB->sign(someMessageA);
-    signatures[3] = userB->sign(someMessageB);
-
-    for (int n = 0; n < signatures.size(); n++) {
-      TEST_ASSERT(signatures[n].size() != 0, end);
-    }
-
+    signatures[0] = userA.sign(someMessageA);
+    signatures[1] = userA.sign(someMessageB);
+    signatures[2] = userB.sign(someMessageA);
+    signatures[3] = userB.sign(someMessageB);
+    
     for (int n = 0; n < signatures.size(); n++) {
       auto id = n > 1 ? vecFromString("UserB") : vecFromString("UserA");
       auto msg = n % 2 ? someMessageB : someMessageA;
-      TEST_ASSERT(userA->verify(id, msg, signatures[n]), end);
+      TEST_ASSERT(userA.verify(id, msg, signatures[n]), end);
     }
   }
   TEST_END;
 
+#if 0
   TEST_ONCE("Test ECCSI") {
     using namespace std;
     using namespace relic;
@@ -117,7 +110,7 @@ int main(void) {
     }
   }
   TEST_END;
-
+#endif
 
   code = STS_OK;
 

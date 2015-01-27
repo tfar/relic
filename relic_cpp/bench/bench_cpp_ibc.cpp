@@ -39,23 +39,24 @@ extern "C" {
 }
 
 #include <vector>
+#include <tuple>
 
 static void bench_shibs() {
   using namespace std;
   using namespace relic;
 
-  shared_ptr<IBC::IBS::KGC> kgc = make_shared<IBC::SHIBS::KGC>();
+  IBC::SHIBS::KGC kgc;
 
   vector<char> idA(50);
   vector<char> idB(50);
 
   // benchmark key extraction
   rand_bytes((uint8_t*)idA.data(), idA.size());
-  unique_ptr<IBC::IBS::User> userA = kgc->generateUser(idA);
-  unique_ptr<IBC::IBS::User> userB;
+  IBC::SHIBS::User userA = kgc.generateUser(idA);
+  IBC::SHIBS::User userB = kgc.generateUser(idB);
   BENCH_BEGIN("SH-IBS (key extraction)") {
     rand_bytes((uint8_t*)idB.data(), idB.size());
-    BENCH_ADD(userB = kgc->generateUser(idB));
+    BENCH_ADD(userB = kgc.generateUser(idB));
   }
   BENCH_END;
 
@@ -65,75 +66,77 @@ static void bench_shibs() {
     rand_bytes((uint8_t*)messages[n].data(), messages[n].size());
   }
 
-  vector<vector<unique_ptr<relic::type> > > signaturesOfA;
-  vector<vector<unique_ptr<relic::type> > > signaturesOfB;
+  vector<tuple<relic::bn, relic::bn> > signaturesOfA;
+  vector<tuple<relic::bn, relic::bn> > signaturesOfB;
 
   int n = 0;
   for (int n = 0; n < 100; n++) {
-    signaturesOfA.push_back(userA->sign(messages[n]));
-    signaturesOfB.push_back(userB->sign(messages[n]));
+    signaturesOfA.push_back(userA.sign(messages[n]));
+    signaturesOfB.push_back(userB.sign(messages[n]));
   }
   // benchmark signature generation
   BENCH_BEGIN("SH-IBS (signature generation)") {
     n++;
-    BENCH_ADD(signaturesOfA[n % 100] = move(userA->sign(messages[n % 100])));
+    BENCH_ADD(signaturesOfA[n % 100] = move(userA.sign(messages[n % 100])));
   }
   BENCH_END;
 
   // benchmark signature verification
   BENCH_BEGIN("SH-IBS (signature verification)") {
     n++;
-    BENCH_ADD(userB->verify(idA, messages[n % 100], signaturesOfA[n % 100]));
+    BENCH_ADD(userB.verify(idA, messages[n % 100], signaturesOfA[n % 100]));
   }
   BENCH_END;
 }
 
 static void bench_vbnnibs() {
-using namespace std;
-using namespace relic;
+  using namespace std;
+  using namespace relic;
 
-shared_ptr<IBC::IBS::KGC> kgc = make_shared<IBC::vBNN_IBS::KGC>();
+  IBC::vBNN_IBS::KGC kgc;
 
-vector<char> idA(50);
-vector<char> idB(50);
+  vector<char> idA(50);
+  vector<char> idB(50);
 
-// benchmark key extraction
-rand_bytes((uint8_t*)idA.data(), idA.size());
-unique_ptr<IBC::IBS::User> userA = kgc->generateUser(idA);
-unique_ptr<IBC::IBS::User> userB;
-BENCH_BEGIN("vBNN-IBS (key extraction)") {
-  rand_bytes((uint8_t*)idB.data(), idB.size());
-  BENCH_ADD(userB = kgc->generateUser(idB));
-}
-BENCH_END;
+  // benchmark key extraction
+  rand_bytes((uint8_t*)idA.data(), idA.size());
+  IBC::vBNN_IBS::User userA = kgc.generateUser(idA);
+  IBC::vBNN_IBS::User userB = kgc.generateUser(idB);
+  
+  BENCH_BEGIN("vBNN-IBS (key extraction)") {
+    rand_bytes((uint8_t*)idB.data(), idB.size());
+    BENCH_ADD(userB = kgc.generateUser(idB));
+  }
+  BENCH_END;
 
-vector<vector<char> > messages;
-for (int n = 0; n < 100; n++) {
-  messages.push_back(vector<char>(100));
-  rand_bytes((uint8_t*)messages[n].data(), messages[n].size());
-}
+  vector<vector<char> > messages;
+  for (int n = 0; n < 100; n++) {
+    messages.push_back(vector<char>(100));
+    rand_bytes((uint8_t*)messages[n].data(), messages[n].size());
+  }
 
-vector<vector<unique_ptr<relic::type> > > signaturesOfA;
-vector<vector<unique_ptr<relic::type> > > signaturesOfB;
+  vector<tuple<ec, bn, bn> > signaturesOfA;
+  vector<tuple<ec, bn, bn> > signaturesOfB;
 
-int n = 0;
-for (int n = 0; n < 100; n++) {
-  signaturesOfA.push_back(userA->sign(messages[n]));
-  signaturesOfB.push_back(userB->sign(messages[n]));
-}
-// benchmark signature generation
-BENCH_BEGIN("vBNN-IBS (signature generation)") {
-  n++;
-  BENCH_ADD(signaturesOfA[n % 100] = move(userA->sign(messages[n % 100])));
-}
-BENCH_END;
+  int n = 0;
+  for (int n = 0; n < 100; n++) {
+    signaturesOfA.push_back(userA.sign(messages[n]));
+    signaturesOfB.push_back(userB.sign(messages[n]));
+  }
+  
+  // benchmark signature generation
+  BENCH_BEGIN("vBNN-IBS (signature generation)") {
+    n++;
+    BENCH_ADD(signaturesOfA[n % 100] = userA.sign(messages[n % 100]));
+  }
+  BENCH_END;
 
-// benchmark signature verification
-BENCH_BEGIN("vBNN-IBS (signature verification)") {
-  n++;
-  BENCH_ADD(userB->verify(idA, messages[n % 100], signaturesOfA[n % 100]));
-}
-BENCH_END;
+  // benchmark signature verification
+  BENCH_BEGIN("vBNN-IBS (signature verification)") {
+    n++;
+    BENCH_ADD(userB.verify(idA, messages[n % 100], signaturesOfA[n % 100]));
+  }
+  BENCH_END;
 }
 
 int main(void) {
