@@ -164,8 +164,7 @@ vBNN_IBS::KGC::KGC() {
 	// === Setup ===
 	bn n = ec::order();
 	msk_ = bn::nonzero_random() % n;
-	P_ = ec::generator();
-	mpk_ = P_ * msk_;
+	mpk_ = ec::generator() * msk_;
 }
 
 vBNN_IBS::User vBNN_IBS::KGC::generateUser(const std::vector<char>& id) {

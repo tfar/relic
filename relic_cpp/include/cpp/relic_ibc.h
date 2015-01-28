@@ -97,7 +97,6 @@ namespace IBC {
 			vBNN_IBS::User generateUser(const std::vector<char>& id);
 
 		private:
-			relic::ec P_;				/* generator */
 			relic::ec mpk_;			/* master public key */
 			relic::bn msk_;			/* master secret key */
 		};
