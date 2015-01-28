@@ -28,6 +28,7 @@
 #include <array>
 #include <string>
 #include <vector>
+#include <functional>
 
 #include "cpp/relic_bn.h"
 #include "cpp/relic_ec.h"
@@ -50,6 +51,10 @@ namespace relic {
   // c++ types
   void concat(std::vector<uint8_t> &r, const std::string &str);
   void concat(std::vector<uint8_t> &r, const std::vector<char> &vec);
+  template <typename T>
+  void concat(std::vector<uint8_t> &r, const std::reference_wrapper<T> &wrapped) {
+    concat(r, wrapped.get());
+  }
 
   // relic types
   void concat(std::vector<uint8_t> &r, const ec &P);

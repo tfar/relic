@@ -123,10 +123,10 @@ void SHIBS::KGC::initRSA() {
   }
 }
 
-vBNN_IBS::User::User(const std::vector<char>& id, relic::ec mpk, relic::ec keyR, relic::bn keys) : id_(id), mpk_(mpk), keyR_(keyR), keys_(keys) {
+vBNN_IBS::User::User(std::vector<char>& id, relic::ec mpk, relic::ec keyR, relic::bn keys) : id_(id), mpk_(mpk), keyR_(keyR), keys_(keys) {
 }
 
-bool vBNN_IBS::User::verify(const std::vector<char>& id, const std::vector<char>& message, const std::tuple<relic::ec, relic::bn, relic::bn>& signature) const {
+bool vBNN_IBS::User::verify(std::vector<char>& id, const std::vector<char>& message, const std::tuple<relic::ec, relic::bn, relic::bn>& signature) const {
 	bool valid = false;
 
 	const ec& R = std::get<0>(signature);
@@ -167,7 +167,7 @@ vBNN_IBS::KGC::KGC() {
 	mpk_ = ec::generator() * msk_;
 }
 
-vBNN_IBS::User vBNN_IBS::KGC::generateUser(const std::vector<char>& id) {
+vBNN_IBS::User vBNN_IBS::KGC::generateUser(std::vector<char>& id) {
 	// === Key Extraction ===
 	bn n = ec::order();
 	bn r = bn::nonzero_random() % n;

@@ -58,8 +58,12 @@ int main(void) {
 
     IBC::vBNN_IBS::KGC kgc;
 
-    IBC::vBNN_IBS::User userA = kgc.generateUser(vecFromString("UserA"));
-    IBC::vBNN_IBS::User userB = kgc.generateUser(vecFromString("UserB"));
+    vector<char> userAVec = vecFromString("UserA");
+    vector<char> userBVec = vecFromString("UserB");
+
+
+    IBC::vBNN_IBS::User userA = kgc.generateUser(userAVec);
+    IBC::vBNN_IBS::User userB = kgc.generateUser(userBVec);
 
     vector<char> someMessageA = vecFromString("Some message A.");
     vector<char> someMessageB = vecFromString("Some message B.");
@@ -70,9 +74,9 @@ int main(void) {
     signatures[1] = userA.sign(someMessageB);
     signatures[2] = userB.sign(someMessageA);
     signatures[3] = userB.sign(someMessageB);
-    
+
     for (int n = 0; n < signatures.size(); n++) {
-      auto id = n > 1 ? vecFromString("UserB") : vecFromString("UserA");
+      auto id = n > 1 ? userAVec : userBVec;
       auto msg = n % 2 ? someMessageB : someMessageA;
       TEST_ASSERT(userA.verify(id, msg, signatures[n]), end);
     }

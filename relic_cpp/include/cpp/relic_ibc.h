@@ -25,6 +25,7 @@
 #include <memory>
 #include <vector>
 #include <tuple>
+#include <functional>
 
 #include "relic_bn.h"
 #include "relic_ec.h"
@@ -76,14 +77,14 @@ namespace IBC {
 	public:
 		class User {
 		public:
-			User(const std::vector<char>& id, relic::ec mpk, relic::ec keyR, relic::bn keys);
+			User(std::vector<char>& id, relic::ec mpk, relic::ec keyR, relic::bn keys);
 			~User() {}
-			bool verify(const std::vector<char>& id, const std::vector<char>& message,  const std::tuple<relic::ec, relic::bn, relic::bn>& signature) const;
+			bool verify(std::vector<char>& id, const std::vector<char>& message,  const std::tuple<relic::ec, relic::bn, relic::bn>& signature) const;
 			std::tuple<relic::ec, relic::bn, relic::bn> sign(const std::vector<char>& message) const;
 
 		private:
-			std::vector<char> id_;
-			relic::ec mpk_; /* master */
+			std::reference_wrapper<std::vector<char> > id_;
+			std::reference_wrapper<relic::ec> mpk_; /* master */
 
 			relic::ec keyR_;	/* ID key */
 			relic::bn keys_;	/* ID key */
@@ -94,7 +95,7 @@ namespace IBC {
 			KGC();
 			~KGC() {}
 
-			vBNN_IBS::User generateUser(const std::vector<char>& id);
+			vBNN_IBS::User generateUser(std::vector<char>& id);
 
 		private:
 			relic::ec mpk_;			/* master public key */
