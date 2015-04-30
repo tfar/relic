@@ -13,6 +13,9 @@ RELIC is an ongoing project and features will be added on demand. The focus is t
  * Flexible configuration
  * Maximum efficiency
 
+### Travis CI Status
+[![Build Status](https://travis-ci.org/tfar/relic.svg?branch=master)](https://travis-ci.org/tfar/relic) 
+
 ### Algorithms
 
 RELIC implements to date:
