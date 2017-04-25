@@ -291,7 +291,7 @@ static void fp3_calc() {
 /* Public definitions                                                         */
 /*============================================================================*/
 
-void fp_prime_init() {
+void fp_prime_init(void) {
 	ctx_t *ctx = core_get();
 	ctx->fp_id = 0;
 	bn_init(&(ctx->prime), FP_DIGS);
@@ -305,7 +305,7 @@ void fp_prime_init() {
 #endif
 }
 
-void fp_prime_clean() {
+void fp_prime_clean(void) {
 	ctx_t *ctx = core_get();
 	ctx->fp_id = 0;
 #if FP_RDC == QUICK || !defined(STRIP)
@@ -354,15 +354,15 @@ const dig_t *fp_prime_get_conv(void) {
 #endif
 }
 
-dig_t fp_prime_get_mod8() {
+dig_t fp_prime_get_mod8(void) {
 	return core_get()->mod8;
 }
 
-int fp_prime_get_qnr() {
+int fp_prime_get_qnr(void) {
 	return core_get()->qnr;
 }
 
-int fp_prime_get_cnr() {
+int fp_prime_get_cnr(void) {
 	return core_get()->cnr;
 }
 
@@ -423,7 +423,7 @@ void fp_prime_set_pmers(const int *f, int len) {
 	}
 }
 
-void fp_prime_calc() {
+void fp_prime_calc(void) {
 #ifdef WITH_FPX
 	if (fp_prime_get_qnr() != 0) {
 		fp2_calc();
